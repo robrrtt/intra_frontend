@@ -45,16 +45,17 @@ export default {
                 await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
                     withCredentials: true,
                 });
+
                 // Make login request
                 const response = await axios.post('http://localhost:8000/api/login', this.form, {
                     withCredentials: true,
-                })
+                });
                 localStorage.setItem('token', response.data.token)
                 localStorage.setItem('user', JSON.stringify(response.data.user))
                 const role = response.data.user.role
-                if (role === 'user') this.$router.push('/user')
-                else if (role === 'technical') this.$router.push('/technical')
-                else if (role === 'admin') this.$router.push('/admin')
+                if (role === 'user') this.$router.push('/user/dashboard')
+                else if (role === 'technical') this.$router.push('/technical/dashboard')
+                else if (role === 'admin') this.$router.push('/admin/dashboard')
             } catch (error) {
                 this.error = error.response?.data?.error || 'Login failed'
             }
@@ -65,9 +66,9 @@ export default {
     const user = JSON.parse(localStorage.getItem('user'))
 
     if (token && user) {
-        if (user.role === 'admin') this.$router.push('/admin')
-        else if (user.role === 'technical') this.$router.push('/technical')
-        else if (user.role === 'user') this.$router.push('/user')
+        if (user.role === 'admin') this.$router.push('/admin/dashboard')
+        else if (user.role === 'technical') this.$router.push('/technical/dashboard')
+        else if (user.role === 'user') this.$router.push('/user/dashboard')
     }
 }
 

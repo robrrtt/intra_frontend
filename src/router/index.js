@@ -3,6 +3,8 @@ import Login from '../components/Login.vue'
 import TechnicalDashboard from '../Role/Technical/TechnicalDashboard.vue'
 import UserDashboard from '../Role/User/UserDashboard.vue'
 import AdminDashboard from '../Role/Admin/AdminDashboard.vue'
+import TicketsAdmin from '../components/Tickets/IndexAdmin.vue' // or wherever your file is
+import Problem from '../components/Problems/Index.vue' // or wherever your file is
 
 
 const routes = [
@@ -12,57 +14,88 @@ const routes = [
         meta: { guestOnly: true }, // ✅ Only for unauthenticated users
     },
     {
-        path: '/user',
+        path: '/user/dashboard',
         component: UserDashboard,
         meta: { requiresAuth: true, role: 'user' },
     },
     {
-        path: '/technical',
+        path: '/technical/dashboard',
         component: TechnicalDashboard,
         meta: { requiresAuth: true, role: 'technical' },
     },
     {
-        path: '/admin',
+        path: '/admin/dashboard',
         component: AdminDashboard,
         meta: { requiresAuth: true, role: 'admin' },
     },
+    {
+        path: '/admin/tickets',
+        component: TicketsAdmin,
+        meta: { requiresAuth: true, roles: ['admin', 'technical'] },
+    },
+    {
+        path: '/tickets/:id/edit',
+        name: 'EditTicket',
+        component: () => import('@/components/Tickets/Edit.vue'),
+        props: true,
+        meta: { requiresAuth: true, roles: ['admin', 'technical'] },
+    },
+    {
+        path: '/admin/problems',
+        component: Problem,
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+    {
+        path: '/admin/problems/create',
+        component: () => import('@/components/Problems/Create.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+    {
+        path: '/admin/problems/:id/edit',
+        component: () => import('@/components/Problems/Edit.vue'),
+        props: true,
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+
+
+
 ]
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
 })
-
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token')
     const user = JSON.parse(localStorage.getItem('user'))
 
-    // ⛔ Block logged-in users from accessing login page again
+    // ⛔ Redirect authenticated users away from login
     if (to.meta.guestOnly && token && user) {
         switch (user.role) {
             case 'admin':
-                return next('/admin')
+                return next('/admin/dashboard')
             case 'technical':
-                return next('/technical')
+                return next('/technical/dashboard')
             case 'user':
-                return next('/user')
+                return next('/user/dashboard')
             default:
                 return next('/')
         }
     }
 
-    // 🔒 Auth required but no token
+    // 🔒 Requires login, but no token
     if (to.meta.requiresAuth && !token) {
         return next('/')
     }
 
-    // 🔐 Auth required and role doesn't match
-    if (to.meta.requiresAuth && user?.role !== to.meta.role) {
+    // ✅ Only check role match if route actually defines one
+    if (to.meta.requiresAuth && to.meta.roles && !to.meta.roles.includes(user?.role)) {
         return next('/')
     }
 
-    // ✅ All good, proceed
+
     next()
 })
+
 
 export default router

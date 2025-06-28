@@ -1,5 +1,5 @@
 <template>
-    <AuthenticatedLayout/>
+    <AuthenticatedLayout />
     <div class="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
         <!-- Navbar -->
         <header class="bg-white border-b shadow-sm">
@@ -77,70 +77,82 @@
     </div>
 </template>
 
-
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
-import AuthenticatedLayout from '../Layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '../Layouts/AuthenticatedLayout.vue'
 
-export default {
-    data() {
-        return {
-            message: 'Loading...',
-            error: null,
-            success: null,
-            createError: null,
-            form: {
-                name: '',
-                email: '',
-                password: '',
-                role: 'user',
-            }
-        }
-    },
-    async mounted() {
-        try {
-            await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true });
-            const response = await axios.get('http://localhost:8000/api/admin/dashboard', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                withCredentials: true,
-            })
-            this.message = response.data.message
-        } catch (error) {
-            this.error = error.response?.data?.error || 'Failed to load dashboard'
-        }
-    },
-    methods: {
-        async createUser() {
-            try {
-                await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true });
-                const response = await axios.post('http://localhost:8000/api/users', this.form, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                    withCredentials: true,
-                })
-                this.success = response.data.message
-                this.createError = null
-                this.form = { name: '', email: '', password: '', role: 'user' }
-            } catch (error) {
-                this.createError = error.response?.data?.error || 'Failed to create user'
-                this.success = null
-            }
-        },
-        async logout() {
-            try {
-                await axios.post('http://localhost:8000/api/logout', {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-                })
-            } catch (error) {
-                console.error('Logout failed:', error)
-            }
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
-            this.$router.push('/')
-        }
+const router = useRouter()
+
+const message = ref('Loading...')
+const error = ref(null)
+const success = ref(null)
+const createError = ref(null)
+
+const form = ref({
+    name: '',
+    email: '',
+    password: '',
+    role: 'user',
+})
+
+const getDashboard = async () => {
+    try {
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true })
+        const response = await axios.get('http://localhost:8000/api/admin/dashboard', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            withCredentials: true,
+        })
+        message.value = response.data.message
+    } catch (err) {
+        error.value = err.response?.data?.error || 'Failed to load dashboard'
     }
 }
+
+const createUser = async () => {
+    try {
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie', { withCredentials: true })
+        const response = await axios.post('http://localhost:8000/api/users', form.value, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            withCredentials: true,
+        })
+        success.value = response.data.message
+        createError.value = null
+        form.value = {
+            name: '',
+            email: '',
+            password: '',
+            role: 'user',
+        }
+    } catch (err) {
+        createError.value = err.response?.data?.error || 'Failed to create user'
+        success.value = null
+    }
+}
+
+const logout = async () => {
+    try {
+        await axios.post(
+            'http://localhost:8000/api/logout',
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+        )
+    } catch (err) {
+        console.error('Logout failed:', err)
+    }
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    router.push('/')
+}
+
+onMounted(getDashboard)
 </script>
-
-
-
-

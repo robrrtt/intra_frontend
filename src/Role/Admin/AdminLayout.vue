@@ -28,31 +28,15 @@
 
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-3 lg:space-x-4 xl:space-x-6 ml-auto">
-                    <RouterLink to="/"
-                        class="relative block py-2 px-2 lg:px-3 transition-all text-sm lg:text-base whitespace-nowrap text-gray-950 font-bold after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-yellow-500 after:rounded-lg"
-                        exact-active-class="router-link-exact-active">
-                        Home
+                    <RouterLink to="/admin/dashboard" :class="[baseLink, isActive('/admin/dashboard') ? activeLink : '']">
+                        Accounts
                     </RouterLink>
-                    <RouterLink to="/claims"
-                        class="relative block py-2 px-2 lg:px-3 transition-all text-sm lg:text-base whitespace-nowrap text-gray-950 hover:font-bold">
-                        Claims
+                    <RouterLink to="/admin/tickets" :class="[baseLink, isActive('/admin/tickets') ? activeLink : '']">
+                        Tickets
                     </RouterLink>
-                    <button
-                        class="flex items-center py-2 px-2 lg:px-3 text-gray-950 hover:bg-gray-100 text-sm lg:text-base rounded-sm">
-                        Services
-                        <svg class="w-2.5 h-2.5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 4 4 4-4" />
-                        </svg>
-                    </button>
-                    <button
-                        class="flex items-center py-2 px-2 lg:px-3 text-gray-950 hover:bg-gray-100 text-sm lg:text-base rounded-sm">
-                        About Us
-                        <svg class="w-2.5 h-2.5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 4 4 4-4" />
-                        </svg>
-                    </button>
+                    <RouterLink to="/admin/problems" :class="[baseLink, isActive('/admin/problems') ? activeLink : '']">
+                        Problems
+                    </RouterLink>
                     <button @click="logout"
                         class="ml-2 flex items-center gap-2 px-4 py-2 rounded-md bg-red-600 text-white text-sm lg:text-base hover:bg-red-700 transition duration-200 shadow-sm">
                         Logout
@@ -60,18 +44,22 @@
                 </nav>
             </div>
 
-            <!-- Mobile Navigation -->
+            <!-- Mobile Navigation 
             <transition name="fade">
                 <nav v-if="isMobileNavOpen" class="md:hidden mt-2 space-y-1 bg-white px-2 py-3 rounded shadow-sm">
                     <RouterLink to="/" class="block py-2 text-gray-900 font-semibold" @click="isMobileNavOpen = false">
                         Home</RouterLink>
-                    <RouterLink to="/claims" class="block py-2 text-gray-900" @click="isMobileNavOpen = false">Claims
-                    </RouterLink>
+                    <RouterLink to="/tickets" class="block py-2 text-gray-900" @click="isMobileNavOpen = false">tickets
+                    
+                    </RouterLink>   
+
+
                     <button class="block py-2 text-gray-900 w-full text-left">Services</button>
                     <button class="block py-2 text-gray-900 w-full text-left">About Us</button>
                     <button @click="logout" class="block py-2 text-gray-600 w-full text-left">Logout</button>
                 </nav>
             </transition>
+        -->
         </div>
     </header>
 
@@ -79,14 +67,23 @@
         <slot />
     </main>
 </template>
-
-
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
 import axios from 'axios'
 
+const isMobileNavOpen = ref(false)
+const route = useRoute()
 const router = useRouter()
 
+// Class constants
+const baseLink = 'relative block py-2 px-2 lg:px-3 transition-all text-sm lg:text-base whitespace-nowrap text-gray-950 font-bold'
+const activeLink = 'text-indigo-700 after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-yellow-500 after:rounded-lg'
+
+// Route checker
+const isActive = (path) => route.path === path
+
+// Logout
 const logout = async () => {
     try {
         await axios.post('http://localhost:8000/api/logout', {}, {
