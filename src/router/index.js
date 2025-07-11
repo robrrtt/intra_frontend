@@ -5,6 +5,9 @@ import UserDashboard from '../Role/User/UserDashboard.vue'
 import AdminDashboard from '../Role/Admin/AdminDashboard.vue'
 import TicketsAdmin from '../components/Tickets/IndexAdmin.vue' // or wherever your file is
 import Problem from '../components/Problems/Index.vue' // or wherever your file is
+import charts from '../components/charts/Dashboard.vue' // or correct path
+import AdminItem from '../components/Item/ItemDashboard.vue' // or correct path
+import Inventory from '../components/Inventory/Index.vue' // or wherever your file is
 
 
 const routes = [
@@ -26,6 +29,16 @@ const routes = [
     {
         path: '/admin/dashboard',
         component: AdminDashboard,
+        meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+        path: '/admin/charts',
+        component: charts,
+        meta: { requiresAuth: true, role: 'admin' },
+    },
+        {
+        path: '/admin/item',
+        component: AdminItem,
         meta: { requiresAuth: true, role: 'admin' },
     },
     {
@@ -54,6 +67,30 @@ const routes = [
         path: '/admin/problems/:id/edit',
         component: () => import('@/components/Problems/Edit.vue'),
         props: true,
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+
+    {
+        path: '/admin/inventory',
+        component: Inventory,
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+    {
+        path: '/admin/inventory/create',
+        component: () => import('@/components/inventory/Create.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+    {
+        path: '/admin/inventory/:id/edit',
+        component: () => import('@/components/inventory/Edit.vue'),
+        props: true,
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+
+    //create item category
+        {
+        path: '/admin/itemcategory/create',
+        component: () => import('@/components/ItemCategory/Create.vue'),
         meta: { requiresAuth: true, roles: ['admin'] },
     },
 

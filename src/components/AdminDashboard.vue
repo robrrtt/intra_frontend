@@ -4,7 +4,7 @@
         <!-- Navbar -->
         <header class="bg-white border-b shadow-sm">
             <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold tracking-tight text-gray-900">Admin Dashboard</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">Admins Dashboard</h1>
                 <button @click="logout"
                     class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">
                     Logout
