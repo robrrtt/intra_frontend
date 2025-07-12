@@ -54,13 +54,13 @@
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
 
-                <!-- Serial Number -->
+                <!-- Serial Number 
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700">Serial Number</label>
                     <input v-model="form.serial_number" type="text" placeholder="e.g., SN12345678"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
-
+-->
                 <!-- Quantity -->
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700">Quantity</label>
@@ -72,7 +72,7 @@
                 <!-- Unit -->
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700">Unit</label>
-                    <input v-model="form.unit" type="text" placeholder="e.g., pcs, box"
+                    <input v-model="form.unit" type="text" placeholder="e.g., pcs, box, ream"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
 
@@ -83,13 +83,13 @@
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
 
-                <!-- Location -->
+                <!-- Location 
                 <div class="md:col-span-2">
                     <label class="block mb-1 text-sm font-medium text-gray-700">Location</label>
                     <input v-model="form.location" type="text" placeholder="e.g., IT Room A"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
-
+-->
                 <!-- Error -->
                 <div v-if="errorMessage" class="md:col-span-2 text-red-600 text-center">
                     {{ errorMessage }}

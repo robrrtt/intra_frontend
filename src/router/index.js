@@ -76,6 +76,29 @@ const routes = [
         meta: { requiresAuth: true, roles: ['admin'] },
     },
     {
+        path: '/admin/inventory/resupply',
+        component: () => import('@/components/inventory/RequestSupply.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+//requests dashboard
+    {
+        path: '/admin/supply/dashboard',
+        component: () => import('@/components/Supplyrequest/AdminSupplyRequests.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] },
+    },
+    {
+        path: '/supply/requests',
+        component: () => import('@/components/Supplyrequest/RequestSupplyForm.vue'),
+        meta: { requiresAuth: true, roles: ['admin','user','technical'] },
+    },
+
+        {
+        path: '/supply/requests/list',
+        component: () => import('@/components/Supplyrequest/UserRequestSummary.vue'),
+        meta: { requiresAuth: true, roles: ['admin','user','technical'] },
+    },
+
+    {
         path: '/admin/inventory/create',
         component: () => import('@/components/inventory/Create.vue'),
         meta: { requiresAuth: true, roles: ['admin'] },
@@ -88,11 +111,16 @@ const routes = [
     },
 
     //create item category
+          {
+        path: '/admin/itemcategory/',
+        component: () => import('@/components/ItemCategory/Index.vue'),
+        meta: { requiresAuth: true, roles: ['admin'] },
+        },
         {
         path: '/admin/itemcategory/create',
         component: () => import('@/components/ItemCategory/Create.vue'),
         meta: { requiresAuth: true, roles: ['admin'] },
-    },
+        },
 
 
 

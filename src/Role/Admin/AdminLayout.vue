@@ -50,7 +50,16 @@
                     <RouterLink to="/admin/inventory" :class="[baseLink, isActive('/admin/inventory') ? activeLink : '']">
                         Supply
                     </RouterLink>
-                    <RouterLink to="/admin/ItemCategory/Create" :class="[baseLink, isActive('/admin/ItemCategory/Create') ? activeLink : '']">
+                    <RouterLink to="/admin/supply/dashboard" :class="[baseLink, isActive('/admin/supply/dashboard') ? activeLink : '']">
+                        Request dashboard
+                    </RouterLink>
+                    <RouterLink to="/supply/requests" :class="[baseLink, isActive('/supply/requests') ? activeLink : '']">
+                        Request Supply
+                    </RouterLink>
+                    <RouterLink to="/supply/requests/list" :class="[baseLink, isActive('/supply/requests/list') ? activeLink : '']">
+                        Request dashboard
+                    </RouterLink>
+                    <RouterLink to="/admin/ItemCategory" :class="[baseLink, isActive('/admin/ItemCategory') ? activeLink : '']">
                         Category
                     </RouterLink>
                     <button @click="logout"

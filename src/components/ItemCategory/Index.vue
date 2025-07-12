@@ -7,12 +7,16 @@
             <div class="mt-6 flex justify-end">
                 <button @click="isModalOpen = true"
                     class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
-                    Add Stocks
+                    Add Stockssss
                 </button>
             </div>
 
             <!-- Supply Modal -->
-            <EditInventory v-if="isModalOpen" @close="isModalOpen = false" />
+            <CreateItem v-if="isModalOpen" @close="isModalOpen = false" />
+            <select v-model="selectedType" @change="fetchItems" class="mb-4 border rounded p-2">
+                <option value="Consumable">Consumable</option>
+                <option value="Non-Consumable">Non-Consumable</option>
+            </select>
 
             <!-- Inventory Table -->
             <div class="bg-white shadow-lg rounded-xl overflow-x-auto mt-6">
@@ -20,17 +24,17 @@
                     <thead class="bg-gray-50">
                         <tr class="text-sm text-gray-600 uppercase tracking-wide text-left">
                             <th class="px-6 py-3">ID</th>
-                            <th class="px-6 py-3">Item Name</th>
+                            <th class="px-6 py-3">Category</th>
                             <th class="px-6 py-3">Type</th>
-                            <th class="px-6 py-3 text-center">Quantity</th>
-                            <th class="px-6 py-3">Unit</th>
+                            <th class="px-6 py-3">Description</th>
+                            <th class="px-6 py-3">serial Number</th>
                             <th class="px-6 py-3 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-sm text-gray-800">
                         <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50 transition duration-150">
                             <td class="px-6 py-4 font-medium text-gray-700">{{ item.id }}</td>
-                            <td class="px-6 py-4">{{ item.name }}</td>
+                            <td class="px-6 py-4">{{ item.category }}</td>
                             <td class="px-6 py-4">
                                 <span :class="[
                                     'text-xs px-2 py-1 rounded-full font-medium',
@@ -41,10 +45,8 @@
                                     {{ item.type }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center font-semibold">
-                                {{ item.quantity }}
-                            </td>
-                            <td class="px-6 py-4">{{ item.unit }}</td>
+                            <td class="px-6 py-4">{{ item.description }}</td>
+                            <td class="px-6 py-4">{{ item.serial_number }}</td>
                             <td class="px-6 py-4 text-right">
                                 <router-link :to="`/items/${item.id}/edit`"
                                     class="text-blue-600 hover:underline font-medium">
@@ -85,37 +87,35 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import AdminLayout from '@/Role/Admin/AdminLayout.vue'
-import EditInventory from '@/components/inventory/Create.vue'
-import EditSupply from '@/components/inventory/Edit.vue'
-
+import CreateItem from '@/components/ItemCategory/Create.vue'
 
 const isModalOpen = ref(false)
-
 const items = ref([])
 const pagination = ref({})
 const currentPage = ref(1)
 const perPage = 10
+const selectedType = ref('Consumable') // Default type
 
 const fetchItems = async () => {
     try {
         const token = localStorage.getItem('token')
-        const res = await axios.get(
-            `http://localhost:8000/api/items?page=${currentPage.value}&per_page=${perPage}`,
+        const { data } = await axios.get(
+            `http://localhost:8000/api/item-categories/type/${selectedType.value}?page=${currentPage.value}&per_page=${perPage}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    Accept: 'application/json',
-                },
+                    Accept: 'application/json'
+                }
             }
         )
 
-        items.value = res.data.data
+        items.value = data.data
         pagination.value = {
-            current_page: res.data.current_page,
-            last_page: res.data.last_page,
+            current_page: data.current_page,
+            last_page: data.last_page
         }
-    } catch (e) {
-        console.error('❌ Failed to load items:', e)
+    } catch (err) {
+        console.error('❌ Failed to load items:', err)
     }
 }
 
@@ -140,5 +140,10 @@ const goToPage = (page) => {
         currentPage.value = page
         fetchItems()
     }
+}
+
+const handleModalClose = () => {
+    isModalOpen.value = false
+    fetchItems()
 }
 </script>

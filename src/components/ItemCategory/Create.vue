@@ -1,81 +1,85 @@
 <template>
-    <AdminLayout>
-  <div class="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
-    <h2 class="text-2xl font-semibold mb-4">Create New Item Category</h2>
-
-    <form @submit.prevent="submitCategory" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium">Type</label>
-        <select v-model="form.type" class="w-full border p-2 rounded" required>
-          <option disabled value="">Select type</option>
-          <option>Consumable</option>
-          <option>Non-Consumable</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium">Category Name</label>
-        <input
-          v-model="form.category"
-          type="text"
-          class="w-full border p-2 rounded"
-          placeholder="e.g., Mouse, Monitor"
-          required
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium">Serial Number</label>
-        <input
-          v-model="form.serial_number"
-          type="text"
-          class="w-full border p-2 rounded"
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-      >
-        Save Category
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="relative w-full max-w-lg bg-white rounded-xl shadow-lg p-8 mx-4 animate-slide-fade">
+      <!-- Close Button -->
+      <button @click="$emit('close')"
+        class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition text-xl font-bold"
+        aria-label="Close">
+        ×
       </button>
-    </form>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create New Item Category</h2>
 
-    <!-- Category List (Optional) -->
-    <div class="mt-6">
-      <h3 class="text-lg font-semibold mb-2">Existing Categories</h3>
-      <table class="w-full text-sm border">
-        <thead class="bg-gray-100 text-left">
-          <tr>
-            <th class="p-2">Type</th>
-            <th class="p-2">Category</th>
-            <th class="p-2">Serial Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="cat in categories" :key="cat.id" class="border-t">
-            <td class="p-2">{{ cat.type }}</td>
-            <td class="p-2">{{ cat.category }}</td>
-            <td class="p-2">{{ cat.serial_number }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <form @submit.prevent="submitCategory" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Type -->
+          <div>
+            <label class="block mb-1 text-sm font-medium text-gray-700">Type</label>
+            <select v-model="form.type"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required>
+              <option disabled value="">Select type</option>
+              <option>Consumable</option>
+              <option>Non-Consumable</option>
+            </select>
+          </div>
+
+          <!-- Category Name -->
+          <div>
+            <label class="block mb-1 text-sm font-medium text-gray-700">Category Name</label>
+            <input v-model="form.category" type="text" placeholder="e.g., Mouse, Monitor"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required />
+          </div>
+
+          <!-- Serial Number (read-only) -->
+          <div class="md:col-span-2">
+            <label class="block mb-1 text-sm font-medium text-gray-700">Serial Number</label>
+            <input v-model="form.serial_number" type="text" readonly
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required />
+          </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block mb-1 text-sm font-medium text-gray-700">Description</label>
+            <textarea v-model="form.description" placeholder="e.g., Used for printing office documents"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              rows="3" required></textarea>
+          </div>
+
+          <!-- Error Message -->
+          <div v-if="errorMessage" class="md:col-span-2 text-red-600 text-center">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Buttons -->
+          <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+            <button type="reset" class="px-4 py-2 rounded-md border text-gray-700 hover:bg-gray-100 transition">
+              Reset
+            </button>
+            <button type="submit" :disabled="isSubmitting"
+              class="px-6 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              :class="{ 'opacity-50 cursor-not-allowed': isSubmitting }">
+              {{ isSubmitting ? 'Saving...' : 'Save Category' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-</AdminLayout>
 </template>
 
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+
 import axios from 'axios'
-import AdminLayout from '@/Role/Admin/AdminLayout.vue'
 
 // Reactive form fields
 const form = ref({
   type: '',
   category: '',
-  serial_number: ''
+  serial_number: '',
+  description: ''
+
 })
 
 // Submission state
@@ -91,6 +95,23 @@ const fetchCategories = async () => {
   const res = await axios.get('http://localhost:8000/api/item-categories')
   categories.value = res.data
 }
+
+// Utility to generate a random ID
+const generateRandomId = () => {
+  return Math.floor(100 + Math.random() * 900) // 3-digit random number
+}
+
+// Watch the form.type and auto-generate serial_number
+watch(() => form.value.type, (newType) => {
+  if (newType === 'Consumable') {
+    form.value.serial_number = `ISAC-CON-${generateRandomId()}`
+  } else if (newType === 'Non-Consumable') {
+    form.value.serial_number = `ISAC-NCON-${generateRandomId()}`
+  } else {
+    form.value.serial_number = ''
+  }
+})
+
 
 const submitCategory = async () => {
   isSubmitting.value = true
@@ -127,4 +148,3 @@ onMounted(() => {
   fetchCategories()
 })
 </script>
-
